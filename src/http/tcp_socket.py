@@ -9,6 +9,7 @@ class EpollServerSocket:
     def __init__(self, host, port):
         self.sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sckt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sckt.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.sckt.bind((host, port))
         self.sckt.listen(1)
         self.sckt.setblocking(False)
@@ -39,11 +40,13 @@ class EpollServerSocket:
         if EOL1 in self.requests[file_no] or EOL2 in self.requests[file_no]:
             self.responses[file_no] = callback(self.requests[file_no])
             self.epoll.modify(file_no, select.EPOLLOUT)
+            self.connections[file_no].setsockopt(socket.IPPROTO_TCP, socket.TCP_CORK, 1)
 
     def write_to_connection(self, file_no):
         raw_response = self.connections[file_no].send(self.responses[file_no])
         self.responses[file_no] = self.responses[file_no][raw_response:]
         if len(self.responses[file_no]) == 0:
+            self.connections[file_no].setsockopt(socket.IPPROTO_TCP, socket.TCP_CORK, 0)
             self.epoll.modify(file_no, 0)
             self.connections[file_no].shutdown(socket.SHUT_RDWR)
 
