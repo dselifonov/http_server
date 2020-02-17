@@ -10,7 +10,7 @@ class EpollServerSocket:
         self.sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sckt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sckt.bind((host, port))
-        self.sckt.listen(1)
+        self.sckt.listen(50)
         self.sckt.setblocking(False)
 
         self.epoll = select.epoll()
