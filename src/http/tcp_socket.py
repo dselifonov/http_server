@@ -9,7 +9,6 @@ class EpollServerSocket:
     def __init__(self, host, port):
         self.sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sckt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sckt.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.sckt.bind((host, port))
         self.sckt.listen(1)
         self.sckt.setblocking(False)

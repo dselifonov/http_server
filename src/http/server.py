@@ -49,8 +49,6 @@ class HTTPServer:
         method, target, version = words
         if version not in ('HTTP/1.0', 'HTTP/1.1'):
             raise HTTPError(400, 'Unexpected protocol version')
-
-        print(f"{method} {target} {version} -> ", end="")
         return method, target, version
 
     @staticmethod
@@ -117,5 +115,4 @@ class HTTPServer:
         binary_response += self._write_headers(response)
         if response.body:
             binary_response += response.body
-        print(f"{response.status} {response.reason}")
         return binary_response
