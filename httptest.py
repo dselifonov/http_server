@@ -91,7 +91,7 @@ class HttpServer(unittest.TestCase):
         data = r.read()
         self.assertEqual(int(r.status), 404)
 
-    def test_file_with_query_string(self):
+    def test_file_with_query_string_1(self):
         """query string after filename"""
         self.conn.request("GET", "/httptest/dir2/page.html?arg1=value&arg2=value")
         r = self.conn.getresponse()

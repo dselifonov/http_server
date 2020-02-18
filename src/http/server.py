@@ -2,6 +2,7 @@ import datetime
 import io
 import select
 from email.parser import Parser
+from multiprocessing import Process
 
 from src.http import HTTPError
 from src.http.request import Request, GET, HEAD
@@ -20,21 +21,38 @@ class HTTPServer:
         self._root_dir = root_dir
         self._workers = workers
 
+    @staticmethod
+    def register_epoll(fd):
+        epoll = select.epoll()
+        epoll.register(fd, select.EPOLLIN)
+        return epoll
+
     def serve(self):
         server_socket = EpollServerSocket(self._host, self._port)
+        epoll = self.register_epoll(server_socket.sckt.fileno())
+        workers = [Process(target=self._serve_loop, args=(server_socket,)) for _ in range(self._workers)]
         try:
-            while True:
-                for file_descriptor, event in server_socket.events:
-                    if file_descriptor == server_socket.sckt.fileno():
-                        server_socket.register_connection()
-                    elif event & select.EPOLLIN:
-                        server_socket.read_from_connection(file_descriptor, self.handle_request)
-                    elif event & select.EPOLLOUT:
-                        server_socket.write_to_connection(file_descriptor)
-                    elif event & select.EPOLLHUP:
-                        server_socket.close_connection(file_descriptor)
+            # self._serve_loop(server_socket)
+            for w in workers:
+                w.start()
+            for w in workers:
+                w.join()
         finally:
-            server_socket.close()
+            server_socket.close(epoll)
+
+    def _serve_loop(self, server_socket):
+        epoll = self.register_epoll(server_socket.sckt.fileno())
+        connections = {}
+        while True:
+            for file_descriptor, event in epoll.poll(1):
+                if file_descriptor == server_socket.sckt.fileno():
+                    server_socket.register_connection(connections, epoll)
+                elif event & select.EPOLLIN:
+                    server_socket.read_from_connection(connections, epoll, file_descriptor, self.handle_request)
+                elif event & select.EPOLLOUT:
+                    server_socket.write_to_connection(connections, epoll, file_descriptor)
+                elif event & select.EPOLLHUP:
+                    server_socket.close_connection(connections, epoll, file_descriptor)
 
     @staticmethod
     def _parse_request_line(file: io.BytesIO) -> (str, str, str):
