@@ -13,7 +13,6 @@ class EpollServerSocket:
         self.sckt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sckt.bind((host, port))
         self.sckt.listen(50)
-        # self.sckt.setblocking(False)
 
     def register_connection(self, connections, epoll):
         connection, _ = self.sckt.accept()

@@ -32,7 +32,6 @@ class HTTPServer:
         epoll = self.register_epoll(server_socket.sckt.fileno())
         workers = [Process(target=self._serve_loop, args=(server_socket,)) for _ in range(self._workers)]
         try:
-            # self._serve_loop(server_socket)
             for w in workers:
                 w.start()
             for w in workers:
