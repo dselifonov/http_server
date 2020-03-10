@@ -1,3 +1,6 @@
+DEFAULT_ENCODING = 'iso-8859-1'
+
+
 class HTTPError(Exception):
     def __init__(self, status: int, reason: str, body=None):
         super()

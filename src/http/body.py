@@ -1,3 +1,5 @@
+import os
+
 CONTENT_TYPES = {
     '.html': 'text/html',
     '.css': 'text/css',
@@ -11,10 +13,11 @@ CONTENT_TYPES = {
 
 
 class Body:
-    def __init__(self, name: str, extension: str, data: bytes = None):
+    def __init__(self, path: str, name: str, extension: str, file):
+        self.path = path
         self.name = name
         self.extension = extension
-        self.data = data
+        self.file = file
 
     @property
     def content_type(self) -> str:
@@ -22,4 +25,4 @@ class Body:
 
     @property
     def length(self) -> int:
-        return len(self.data) if self.data else 0
+        return os.path.getsize(self.path)

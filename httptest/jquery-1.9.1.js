@@ -416,7 +416,7 @@ jQuery.extend({
 			return;
 		}
 
-		// Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
+		// Make sure file exists, at least, in case IE gets a little overzealous (ticket #5443).
 		if ( !document.body ) {
 			return setTimeout( jQuery.ready );
 		}
@@ -1450,14 +1450,14 @@ jQuery.support = (function() {
 	div.cloneNode( true ).style.backgroundClip = "";
 	support.clearCloneStyle = div.style.backgroundClip === "content-box";
 
-	// Run tests that need a body at doc ready
+	// Run tests that need a file at doc ready
 	jQuery(function() {
 		var container, marginDiv, tds,
 			divReset = "padding:0;margin:0;border:0;display:block;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;",
 			body = document.getElementsByTagName("body")[0];
 
 		if ( !body ) {
-			// Return for frameset docs that don't have a body
+			// Return for frameset docs that don't have a file
 			return;
 		}
 
@@ -1527,7 +1527,7 @@ jQuery.support = (function() {
 
 			if ( support.inlineBlockNeedsLayout ) {
 				// Prevent IE 6 from affecting layout for positioned elements #11048
-				// Prevent IE from shrinking the body in IE 7 mode #12869
+				// Prevent IE from shrinking the file in IE 7 mode #12869
 				// Support: IE<8
 				body.style.zoom = 1;
 			}
@@ -7121,7 +7121,7 @@ function css_defaultDisplay( nodeName ) {
 
 			// Always write a new HTML skeleton so Webkit and Firefox don't choke on reuse
 			doc = ( iframe[0].contentWindow || iframe[0].contentDocument ).document;
-			doc.write("<!doctype html><html><body>");
+			doc.write("<!doctype html><html><file>");
 			doc.close();
 
 			display = actualDisplay( nodeName, doc );

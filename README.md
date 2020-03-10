@@ -30,6 +30,10 @@ Implement a Web server. Libraries for helping manage TCP socket connections *may
 * `http://localhost/httptest/wikipedia_russia.html` must been shown correctly in browser
 * Lowest-latency response (tested using `ab`, ApacheBench) in the following fashion: `ab -n 50000 -c 100 -r http://localhost:8080/`
 
+## Architecture ##
+Linux select.epoll with multiprocessing have been chosen for task. 
+
+
 ## AB Test Results ##
 ```shell script
 Server Software:        DS

@@ -298,7 +298,7 @@ jQuery(function ($) {
     coord_list[parseInt(d[1])].mb.click();
     break;
    case 'scroll' :
-    $("html:not(:animated),body:not(:animated)").animate({ scrollTop: $(coord_list[parseInt(d[1])].obj).offset().top - 20 + parseInt(d[2]||0) }, 500 );
+    $("html:not(:animated),file:not(:animated)").animate({ scrollTop: $(coord_list[parseInt(d[1])].obj).offset().top - 20 + parseInt(d[2]||0) }, 500 );
     iframe.div.css( { top: yPos( coord_list[parseInt(d[1])].obj ) + 'px'} );
     // make sure scroll target gets highlighted
     setTimeout( function () { highlight(parseInt(d[1])); }, 200 );
@@ -630,13 +630,13 @@ window.kml = kml; // DEBUG!
         adjusthelper();
         lastx = e.pageX;
         lasty = e.pageY;
-        $('body').bind('mouseup.wmaresize', function(e) { 
-         $('body').unbind('mousemove.wmaresize');  
-         $('body').unbind('mouseup.wmaresize'); 
+        $('file').bind('mouseup.wmaresize', function(e) {
+         $('file').unbind('mousemove.wmaresize');
+         $('file').unbind('mouseup.wmaresize');
          idle = true;
          wi.resizehelper.hide();
         } );
-        $('body').bind('mousemove.wmaresize', function(e) { 
+        $('file').bind('mousemove.wmaresize', function(e) {
          wc.width -= dir*(e.pageX-lastx);
          wc.height += (e.pageY-lasty);
          lastx = e.pageX; lasty = e.pageY;

@@ -5,6 +5,7 @@ from src.http.connection import Connection
 
 EOL1 = b'\n\n'
 EOL2 = b'\n\r\n'
+CHUNK_SIZE = 1024  # in bytes
 
 
 class EpollServerSocket:
@@ -22,7 +23,7 @@ class EpollServerSocket:
 
     @staticmethod
     def read_from_connection(connections, epoll, file_no, callback):
-        connections[file_no].request += connections[file_no].client.recv(1024)
+        connections[file_no].request += connections[file_no].client.recv(CHUNK_SIZE)
 
         if EOL1 in connections[file_no].request or EOL2 in connections[file_no].request:
             connections[file_no].response = callback(connections[file_no].request)
@@ -31,9 +32,13 @@ class EpollServerSocket:
 
     @staticmethod
     def write_to_connection(connections, epoll, file_no):
-        raw_response = connections[file_no].client.send(connections[file_no].response)
-        connections[file_no].response = connections[file_no].response[raw_response:]
-        if len(connections[file_no].response) == 0:
+        if not connections[file_no].response.definition_sent:
+            connections[file_no].client.send(connections[file_no].response.send_response_definition())
+        chunk = next(connections[file_no].response.read_body_by_chunks(CHUNK_SIZE), None)
+        if chunk:
+            sent_buffer = connections[file_no].client.send(chunk)
+            connections[file_no].response.cursor += sent_buffer
+        else:
             connections[file_no].client.setsockopt(socket.IPPROTO_TCP, socket.TCP_CORK, 0)
             epoll.modify(file_no, 0)
             connections[file_no].client.shutdown(socket.SHUT_RDWR)

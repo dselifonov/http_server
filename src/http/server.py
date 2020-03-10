@@ -1,16 +1,13 @@
-import datetime
 import io
 import select
 from email.parser import Parser
 from multiprocessing import Process
 
-from src.http import HTTPError
+from src.http import HTTPError, DEFAULT_ENCODING
 from src.http.request import Request, GET, HEAD
 from src.http.response import Response
 from src.http.tcp_socket import EpollServerSocket
 from src.http.utils import get_response_file
-
-DEFAULT_ENCODING = 'iso-8859-1'
 
 
 class HTTPServer:
@@ -97,10 +94,10 @@ class HTTPServer:
             ('Content-Type', response_file.content_type),
             ('Content-Length', response_file.length),
         ]
-        body = response_file.data if method == GET else None
-        return Response(200, 'OK', headers=headers, body=body)
+        file = response_file.file if method == GET else None
+        return Response(200, 'OK', headers=headers, file=file)
 
-    def _build_response(self, binary_data: bytes) -> Response:
+    def handle_request(self, binary_data: bytes) -> Response:
         try:
             request = self._parse_request(binary_data)
             if request.method not in (GET, HEAD):
@@ -110,26 +107,3 @@ class HTTPServer:
             return self._build_error_response(err, err.status, err.reason)
         except Exception as err:
             return self._build_error_response(err, 500, 'Internal Server Error')
-
-    @staticmethod
-    def _write_headers(response: Response) -> bytes:
-        bin_resp = b''
-        default_headers = [
-            ('Date', datetime.datetime.now()),
-            ('Server', 'DS Software ltd. (Unix)'),
-            ('Connection', 'close')
-        ]
-        headers = response.headers + default_headers if response.headers else default_headers
-        for (k, v) in headers:
-            header_line = f"{k}: {v}\r\n"
-            bin_resp += header_line.encode(DEFAULT_ENCODING)
-        return bin_resp + b'\r\n'
-
-    def handle_request(self, binary_data: bytes) -> bytes:
-        response = self._build_response(binary_data)
-        binary_response = b''
-        binary_response += f"HTTP/1.1 {response.status} {response.reason}\r\n".encode(DEFAULT_ENCODING)
-        binary_response += self._write_headers(response)
-        if response.body:
-            binary_response += response.body
-        return binary_response

@@ -101,9 +101,9 @@ class HttpServer(unittest.TestCase):
         self.assertEqual(int(length), 38)
         self.assertEqual(len(data), 38)
         if v3:
-            self.assertEqual(data, b"<html><body>Page Sample</body></html>\n")
+            self.assertEqual(data, b"<html><file>Page Sample</file></html>\n")
         else:
-            self.assertEqual(data, "<html><body>Page Sample</body></html>\n")
+            self.assertEqual(data, "<html><file>Page Sample</file></html>\n")
 
     def test_file_with_spaces(self):
         """filename with spaces"""
@@ -129,9 +129,9 @@ class HttpServer(unittest.TestCase):
         self.assertEqual(int(length), 38)
         self.assertEqual(len(data), 38)
         if v3:
-            self.assertEqual(data, b"<html><body>Page Sample</body></html>\n")
+            self.assertEqual(data, b"<html><file>Page Sample</file></html>\n")
         else:
-            self.assertEqual(data, "<html><body>Page Sample</body></html>\n")
+            self.assertEqual(data, "<html><file>Page Sample</file></html>\n")
 
     def test_large_file(self):
         """large file downloaded correctly"""
