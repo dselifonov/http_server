@@ -33,6 +33,11 @@ Implement a Web server. Libraries for helping manage TCP socket connections *may
 ## Architecture ##
 Linux select.epoll with multiprocessing have been chosen for task. 
 
+## Run ##
+```shell script
+docker build -t http_server . && docker run -p 8080:8080 -d http_server
+```
+
 
 ## AB Test Results ##
 ```shell script

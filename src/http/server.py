@@ -93,7 +93,7 @@ class HTTPServer:
     @staticmethod
     def _build_error_response(err: Exception, status: int, reason: str) -> Response:
         body = str(err).encode(DEFAULT_ENCODING)
-        return Response(status, reason, [('Content-Length', len(body))], body)
+        return Response(status, reason, [('Content-Length', len(body))], io.BytesIO(body))
 
     @staticmethod
     def _build_success_response(root_dir: str, path: str, method: str) -> Response:
@@ -102,7 +102,7 @@ class HTTPServer:
             ('Content-Type', response_file.content_type),
             ('Content-Length', response_file.length),
         ]
-        file = response_file.file if method == GET else None
+        file = response_file.file if method == GET else io.BytesIO()
         return Response(200, 'OK', headers=headers, file=file)
 
     def handle_request(self, binary_data: bytes) -> Response:

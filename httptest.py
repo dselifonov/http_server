@@ -101,7 +101,7 @@ class HttpServer(unittest.TestCase):
         self.assertEqual(int(length), 38)
         self.assertEqual(len(data), 38)
         if v3:
-            self.assertEqual(data, b"<html><file>Page Sample</file></html>\n")
+            self.assertEqual(data, b"<html><body>Page Sample</body></html>\n")
         else:
             self.assertEqual(data, "<html><file>Page Sample</file></html>\n")
 
@@ -129,7 +129,7 @@ class HttpServer(unittest.TestCase):
         self.assertEqual(int(length), 38)
         self.assertEqual(len(data), 38)
         if v3:
-            self.assertEqual(data, b"<html><file>Page Sample</file></html>\n")
+            self.assertEqual(data, b"<html><body>Page Sample</body></html>\n")
         else:
             self.assertEqual(data, "<html><file>Page Sample</file></html>\n")
 

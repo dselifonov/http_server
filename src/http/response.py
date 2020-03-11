@@ -10,7 +10,7 @@ class Response:
         ('Connection', 'close')
     ]
 
-    def __init__(self, status: int, reason: str, headers=list, file=None):
+    def __init__(self, status: int, reason: str, headers=[], file=None):
         self.status = status
         self.reason = reason
         self.headers = Response.default_headers + headers
