@@ -17,38 +17,46 @@ class HTTPServer:
         self._name = name
         self._root_dir = root_dir
         self._workers = workers
+        self.server_socket = EpollServerSocket(self._host, self._port)
 
-    @staticmethod
-    def register_epoll(fd):
-        epoll = select.epoll()
-        epoll.register(fd, select.EPOLLIN)
-        return epoll
-
-    def serve(self):
-        server_socket = EpollServerSocket(self._host, self._port)
-        epoll = self.register_epoll(server_socket.sckt.fileno())
-        workers = [Process(target=self._serve_loop, args=(server_socket,)) for _ in range(self._workers)]
+    def run(self):
+        workers = [Process(target=self.serve) for _ in range(self._workers)]
         try:
             for w in workers:
                 w.start()
             for w in workers:
                 w.join()
         finally:
-            server_socket.close(epoll)
+            for w in workers:
+                w.terminate()
 
-    def _serve_loop(self, server_socket):
-        epoll = self.register_epoll(server_socket.sckt.fileno())
+    def serve(self):
+        epoll = self.register_epoll(self.server_socket.sckt.fileno())
         connections = {}
-        while True:
-            for file_descriptor, event in epoll.poll(1):
-                if file_descriptor == server_socket.sckt.fileno():
-                    server_socket.register_connection(connections, epoll)
-                elif event & select.EPOLLIN:
-                    server_socket.read_from_connection(connections, epoll, file_descriptor, self.handle_request)
-                elif event & select.EPOLLOUT:
-                    server_socket.write_to_connection(connections, epoll, file_descriptor)
-                elif event & select.EPOLLHUP:
-                    server_socket.close_connection(connections, epoll, file_descriptor)
+        try:
+            while True:
+                self._serve_loop(epoll, connections)
+        finally:
+            while connections:
+                self._serve_loop(epoll, connections, shutdown=True)
+            self.server_socket.close(epoll)
+
+    def _serve_loop(self, epoll, connections, shutdown=False):
+        for file_descriptor, event in epoll.poll(1):
+            if not shutdown and file_descriptor == self.server_socket.sckt.fileno():
+                self.server_socket.register_connection(connections, epoll)
+            elif event & select.EPOLLIN:
+                self.server_socket.read_from_connection(connections, epoll, file_descriptor, self.handle_request)
+            elif event & select.EPOLLOUT:
+                self.server_socket.write_to_connection(connections, epoll, file_descriptor)
+            elif event & select.EPOLLHUP:
+                self.server_socket.close_connection(connections, epoll, file_descriptor)
+
+    @staticmethod
+    def register_epoll(fd):
+        epoll = select.epoll()
+        epoll.register(fd, select.EPOLLIN)
+        return epoll
 
     @staticmethod
     def _parse_request_line(file: io.BytesIO) -> (str, str, str):

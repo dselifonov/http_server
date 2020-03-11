@@ -17,7 +17,6 @@ if __name__ == '__main__':
     server = HTTPServer('0.0.0.0', 8080, 'localhost', os.path.join(BASE_DIR, args.r.lstrip('/')), args.w)
     try:
         print('Starting server, use <Ctrl-C> to stop')
-        server.serve()
+        server.run()
     except KeyboardInterrupt:
         print('Server has been stopped')
-        pass
