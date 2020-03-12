@@ -24,5 +24,6 @@ class Request:
         return self.url.query
 
     @property
+    @lru_cache(maxsize=None)
     def path(self) -> str:
         return self.url.path

@@ -10,10 +10,10 @@ class Response:
         ('Connection', 'close')
     ]
 
-    def __init__(self, status: int, reason: str, headers=[], file=None):
+    def __init__(self, status: int, reason: str, headers=None, file=None):
         self.status = status
         self.reason = reason
-        self.headers = Response.default_headers + headers
+        self.headers = Response.default_headers + (headers or [])
         self.file = file
         self.cursor = 0
         self.definition_sent = False
@@ -29,6 +29,8 @@ class Response:
         return bin_resp + b'\r\n'
 
     def read_body_by_chunks(self, chunk_size=1024):
+        if not self.file:
+            return
         while True:
             self.file.seek(self.cursor)
             data = self.file.read(chunk_size)

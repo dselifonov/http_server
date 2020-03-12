@@ -11,10 +11,9 @@ from src.http.utils import get_response_file
 
 
 class HTTPServer:
-    def __init__(self, host: str, port: int, name: str, root_dir: str, workers: int):
+    def __init__(self, host: str, port: int, root_dir: str, workers: int):
         self._host = host
         self._port = port
-        self._name = name
         self._root_dir = root_dir
         self._workers = workers
         self.server_socket = EpollServerSocket(self._host, self._port)

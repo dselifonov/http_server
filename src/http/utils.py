@@ -23,5 +23,4 @@ def get_response_file(root_dir, path):
     if not check_perms(root_dir, doc_path):
         raise HTTPError(403, 'Permission Denied')
 
-    file_name, file_ext = os.path.splitext(doc_path)
-    return Body(doc_path, file_name, file_ext, open(doc_path, 'rb'))
+    return Body(doc_path, open(doc_path, 'rb'))
